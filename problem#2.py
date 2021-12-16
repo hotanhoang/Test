@@ -1,19 +1,17 @@
 
 
+
 '''
     solution 1 : using temporary matrix
 '''
 def rotate_using_temporary_matrix(matrix):
-    #create temporary matrix to save result
-    rotated = [[] for _ in range(len(matrix[0]))]
+    rotated = [[0 for i in range(len((matrix)))] for j in range(len(matrix))]
     for i in range(len(matrix)):
-        for j in range(len(matrix[i])):
-            rotated[len(matrix) - j - 1].append(matrix[i][j])
+        for j in range(len(matrix)):
+            rotated[len(matrix) - j - 1][i] = matrix[i][j]
     return rotated
-
-
 '''
-    solution 2: without using temporary matrix
+    solution 3: without using temporary matrix
 '''
 def rotate_wihout_using_temporary_matrix(matrix):
     #chuyển vị ma trận

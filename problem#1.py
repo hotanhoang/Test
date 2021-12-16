@@ -1,19 +1,19 @@
 '''
     Sau khi tìm hiểu yêu câu bài toán, tôi tiến hành phân tích như sau:
         1.  Thang máy có thể đi lên hoặc đi xuống và sẽ dừng lại ở tầng mà người sử dụng yêu cầu.
-        2.  Nếu thang máy nhận dược yêu câuf đi xuống trong khi đang đi lên thì nó sẽ đi lên tầng cao nhất đối với yêu cầu hiện tai rồi mới đi xuống
+        2.  Nếu thang máy nhận dược yêu cầu đi xuống trong khi đang đi lên thì nó sẽ đi lên tầng cao nhất đối với yêu cầu hiện tai rồi mới đi xuống
         3.  Người sử dụng có thể gửi request bất kì lúc nào.
-        4.  Thang máy hoạt động sẽ ưu tiên về khoảng cách thay vì thời gian. Có nghĩa là, giả sử nếu thang máy đang ở tầng 1, người A muốn đi lên tầng 4,
-        sau đo người B nhấn nút để đi lên tầng 2. Tuy người A yêu cầu thang máy trước nhưng thang máy sẽ không đi lên tầng 4 rồi xuống lại tầng 2 mà sẽ dùng
-        lại ở tầng 2 để người B ra ngoài sau đó đi lên tầng 4. Do đó, yêu cầu sẽ được sắp xếp theo khoảng cách thay vì sắp xếp theo thời gian.
+        4.  Thang máy hoạt động sẽ ưu tiên về khoảng cách thay vì thời gian. Có nghĩa là, giả sử nếu thang máy, người A và người B đang ở tầng 1, người A nhấn nút đi lên tầng 4,
+        sau đó người B nhấn nút để đi lên tầng 2. Tuy người A yêu cầu thang máy trước nhưng thang máy sẽ không đi lên tầng 4 rồi xuống lại tầng 2 mà sẽ dùng
+        lại ở tầng 2 để người B ra ngoài sau đó đi lên tầng 4. Do đó, yêu cầu sẽ được ưu tiên theo khoảng cách thay vì ưu tiên theo thời gian.
     ý tưởng:
         ở đây tôi giả sử là yêu cầu đi lên sẽ được ưu tiên hơn yêu cầu thi xuống. Điều đó có nghĩa rằng khi thang máy đang ở tình trạng chờ, 
-        nếu cả 2 đi lên và đi xuống được yêu cầu cùng lúc thì yêu cầu đi lên sẽ được ưu tiên hơn.
+        nếu 2 trường hợp đi lên và đi xuống được yêu cầu cùng lúc thì yêu cầu đi lên sẽ được ưu tiên hơn.
         Sử dụng OOP để giải quyết bài toán:
             1.  Thiết kết lớp Resquest, lớp Elevator để đại diện cho các instance trong thực tế.
-            2.  Sử dụng cấu trúc dữ liệu hàng đợi ưu tiên (PriorityQueue) để lưu và sử lý các request vì ở đây ưu tiên theo khoảng cách giữa tầng hiện tại vs kế tiếp
-            3.  Sử dụng priorityQueue để lưu các yêu cầu đi xuống và sắp xếp chúng dựa theo desired floor. Tương tự, tôi cũng sử dụng priorityQueue để lưu các yêu
-            đi lên và sắp xếp theo disired floor
+            2.  Sử dụng cấu trúc dữ liệu hàng đợi ưu tiên (PriorityQueue) để lưu và xử lý các request vì ở đây ưu tiên theo khoảng cách giữa tầng hiện tại vs kế tiếp
+            3.  Sử dụng priorityQueue để lưu các yêu cầu đi xuống và sắp xếp chúng dựa theo tầng mong muốn đến. Tương tự, tôi cũng sử dụng priorityQueue để lưu các yêu
+            đi lên và sắp xếp theo tầng mong muốn đến
             4. Khi mà người sử dụng thang máy yêu cầu ở bên ngoài thì thang máy dừng lại tại tầng hiện tại của người gửi yêu cầu để pickup người đó vào thang máy trước
             khi tiếp tục đi đến desired floor.
             5.  Trong quá trình vận chuyển hành khách, nhờ vào cấu trúc dữ liệu hàng đợi ưu tiên mà thuật toán có thẻ nhận và trả khách theo đường tối ưu.
@@ -90,18 +90,18 @@ class Elevator():
             upResquest = self.upQueue.get()
             self.currentFLoor = upResquest.desiredFloor
             print('Thang may dang di len va dung lai tai tang ' + str(self.currentFLoor))
-        if(not self.downQueue.empty()):
+        if(not self.downQueue.empty()): #nếu hàng đợi downQueue không rỗng thì thang máy bắt đầu đi xuống
             self.directon = 'DOWN'
-        else:
+        else: #Ngược lại thì thang máy dừng lại
             self.directon = 'IDLE'
     def DownResquest(self):
         while(not self.downQueue.empty()):
             downResquest = self.downQueue.get()
             self.currentFLoor = downResquest.desiredFloor
             print('Thang may dang di xuong va dung lai lai tai tang ' + str(self.currentFLoor))
-        if(not self.downQueue.empty()):
+        if(not self.upQueue.empty()): #Nếu hàng đợi upQueue không rỗng thì thang máy bắt đầu đi lên
             self.directon = 'UP'
-        else:
+        else: #Ngược lại thì thang máy dừng lại
             self.directon = 'IDLE'
     def processResquest(self):
         if(self.directon == 'UP' or self.directon == 'IDLE'):
@@ -121,8 +121,8 @@ if __name__ == '__main__':
     requestUp_2 = ResUp(elevator.currentFLoor, 3, 'UP', 'IN')
 
     requestDown_1 = ResDown(elevator.currentFLoor, 1, 'DOWN', 'IN')
-    requestDown_2 = ResDown(elevator.currentFLoor, 2, 'DOWN', 'IN')
-    requestDown_3 = ResDown(4, 0, 'DOWN', 'OUT')
+    requestDown_2 = ResDown(elevator.currentFLoor, 3, 'DOWN', 'IN')
+    requestDown_3 = ResDown(2, 0, 'DOWN', 'OUT')
 
     #Giả sử có 2 người ở trong thang máy thực hiện 2 yêu cầu requestUp_1 và RequestUp_2
     elevator.sendUpResquest(upRequest=requestUp_1)
